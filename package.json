@@ -1,0 +1,30 @@
+{
+  "name": "humantyx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "axios": "1.13.6",
+    "bcrypt": "6.0.0",
+    "dotenv": "17.3.1",
+    "express": "5.2.1",
+    "express-oauth2-jwt-bearer": "1.7.4",
+    "express-validator": "7.3.1",
+    "pg": "8.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "3.1.14",
+    "standard": "17.1.2"
+  },
+  "eslintConfig": {
+    "extends": "standard"
+  }
+}
