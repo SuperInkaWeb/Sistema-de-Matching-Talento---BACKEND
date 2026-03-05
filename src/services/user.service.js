@@ -4,7 +4,6 @@ import {
   createUser
 } from '../repositories/user.repository.js'
 
-// Registro en Auth0
 export const registerWithAuth0 = async (email, password) => {
   const response = await axios.post(
     `https://${process.env.AUTH0_DOMAIN}/dbconnections/signup`,
@@ -19,24 +18,25 @@ export const registerWithAuth0 = async (email, password) => {
   return response.data
 }
 
-// Login en Auth0
 export const loginWithAuth0 = async (username, password) => {
   const response = await axios.post(
     `https://${process.env.AUTH0_DOMAIN}/oauth/token`,
     {
-      grant_type: 'client_credentials',
+      grant_type: 'password',
       username,
       password,
       audience: process.env.AUTH0_AUDIENCE,
       client_id: process.env.CLIENT_ID,
-      client_secret: process.env.CLIENT_SECRET
-    }
+      client_secret: process.env.CLIENT_SECRET,
+      scope: 'openid profile email',
+      connection: 'Username-Password-Authentication'
+    },
+    { headers: { 'Content-Type': 'application/json' } }
   )
 
   return response.data
 }
 
-// Obtener o crear usuario en PostgreSQL
 export const getOrCreateUser = async (authUser) => {
   const { sub, email } = authUser
 

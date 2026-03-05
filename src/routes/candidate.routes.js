@@ -1,24 +1,21 @@
 import { Router } from 'express'
-import { checkJwt } from '../middleware/auth0.middleware.js'
-import { getMe, updateMyProfile } from '../controllers/candidate.controller.js'
-import { updateProfileValidator } from '../validations/candidate.validator.js'
-import { validationResult } from 'express-validator'
+import { checkJwt, syncUser } from '../middleware/auth0.middleware.js'
+import { validate } from '../middleware/validate.middleware.js'
+import {
+  getMe,
+  updateMyProfile
+} from '../controllers/candidate.controller.js'
+import { profileSchema } from '../validations/candidate.validator.js'
 
 const router = Router()
 
-router.get('/me', checkJwt, getMe)
+router.get('/me', checkJwt, syncUser, getMe)
 
 router.put(
-  '/me/profile',
+  '/me/edit',
   checkJwt,
-  updateProfileValidator,
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
-    }
-    next()
-  },
+  syncUser,
+  validate(profileSchema),
   updateMyProfile
 )
 

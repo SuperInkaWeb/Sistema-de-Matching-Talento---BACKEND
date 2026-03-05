@@ -1,0 +1,44 @@
+import {
+  uploadResumeService,
+  downloadCVService
+} from '../services/file.service.js'
+
+export const uploadResumeController = async (req, res) => {
+  try {
+    const auth0Id = req.user.sub
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'Archivo requerido' })
+    }
+
+    const result = await uploadResumeService(auth0Id, req.file)
+
+    res.status(201).json(result)
+  } catch (error) {
+    res.status(error.status || 500).json({
+      message: error.message || 'Error interno'
+    })
+  }
+}
+
+export const downloadCV = async (req, res) => {
+  try {
+    const { candidateId } = req.params
+
+    const file = await downloadCVService(candidateId)
+
+    return res.redirect(file.signedUrl)
+  } catch (error) {
+    if (error.message === 'CV_NOT_FOUND') {
+      return res.status(404).json({
+        error: 'CV no encontrado'
+      })
+    }
+
+    console.error(error)
+
+    res.status(500).json({
+      error: 'Error al descargar CV'
+    })
+  }
+}

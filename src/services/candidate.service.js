@@ -21,25 +21,20 @@ export const getMeService = async (auth0Id) => {
   return { user, profile }
 }
 
-export const upsertCandidateProfileService = async (auth0Id, profileData) => {
+export const updateProfileService = async (auth0Id, data) => {
   const user = await findUserByAuth0Id(auth0Id)
 
   if (!user) {
-    throw new Error('USER_NOT_FOUND')
-  }
-
-  if (user.role !== 'candidate') {
-    throw new Error('FORBIDDEN')
+    const error = new Error('Usuario no encontrado')
+    error.status = 404
+    throw error
   }
 
   const existingProfile = await findCandidateProfile(user.id)
 
-  if (existingProfile) {
-    return await updateCandidateProfile(user.id, profileData)
+  if (!existingProfile) {
+    return await createCandidateProfile(user.id, data)
   }
 
-  return await createCandidateProfile({
-    user_id: user.id,
-    ...profileData
-  })
+  return await updateCandidateProfile(user.id, data)
 }

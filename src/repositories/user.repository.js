@@ -1,6 +1,5 @@
-import { pool } from '../database/connectionPostgreSQL.js'
+import { pool } from '../database/connectionSupabase.js'
 
-// Buscar usuario por auth0_id
 export const findUserByAuth0Id = async (auth0Id) => {
   const result = await pool.query(
     `SELECT id, auth0_id, email, role, created_at
@@ -12,13 +11,24 @@ export const findUserByAuth0Id = async (auth0Id) => {
   return result.rows[0] || null
 }
 
-// Crear usuario
 export const createUser = async ({ auth0Id, email }) => {
   const result = await pool.query(
     `INSERT INTO users (auth0_id, email)
      VALUES ($1, $2)
      RETURNING id, auth0_id, email, role, created_at`,
     [auth0Id, email]
+  )
+
+  return result.rows[0]
+}
+
+export const updateUserRole = async (userId, newRole) => {
+  const result = await pool.query(
+    `UPDATE users
+     SET role = $1
+     WHERE id = $2
+     RETURNING *`,
+    [newRole, userId]
   )
 
   return result.rows[0]

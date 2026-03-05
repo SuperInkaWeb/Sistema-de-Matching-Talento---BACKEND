@@ -1,8 +1,11 @@
-import { pool } from '../database/connectionPostgreSQL.js'
+import { pool } from '../database/connectionSupabase.js'
 
 export const findUserByAuth0Id = async (auth0Id) => {
   const result = await pool.query(
-    'SELECT * FROM users WHERE auth0_id = $1',
+    'SELECT u.id, u.email, u.role, u.created_at, p.first_name, ' +
+    'p.last_name, p.phone, p.city, p.country,p.linkedin_url, ' +
+    'p.portfolio_url, p.resume_url, p.skills, p.experience_years ' +
+    'FROM users u LEFT JOIN candidates_profile p ON p.user_id = u.id WHERE u.auth0_id = $1',
     [auth0Id]
   )
   return result.rows[0]
@@ -16,7 +19,7 @@ export const findCandidateProfile = async (userId) => {
   return result.rows[0]
 }
 
-export const createCandidateProfile = async (data) => {
+export const createCandidateProfile = async (userId, data) => {
   const result = await pool.query(
     `INSERT INTO candidates_profile
      (user_id, first_name, last_name, phone, city, country,
@@ -24,7 +27,7 @@ export const createCandidateProfile = async (data) => {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
      RETURNING *`,
     [
-      data.user_id,
+      userId,
       data.first_name,
       data.last_name,
       data.phone,
@@ -70,6 +73,20 @@ export const updateCandidateProfile = async (userId, data) => {
       userId
     ]
   )
+
+  return result.rows[0]
+}
+
+export const updateResumeUrl = async (userId, resumeUrl) => {
+  const query = `
+    UPDATE candidates_profile
+    SET resume_url = $1
+    WHERE user_id = $2
+    RETURNING *;
+  `
+
+  const values = [resumeUrl, userId]
+  const result = await pool.query(query, values)
 
   return result.rows[0]
 }
