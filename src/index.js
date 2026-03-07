@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
+import cors from 'cors'
 import candidatesRoutes from './routes/candidate.routes.js'
 import userRoutes from './routes/user.routes.js'
 import fileRoutes from './routes/file.routes.js'
@@ -8,6 +9,10 @@ import vacancyRoutes from './routes/vacancy.routes.js'
 import applyRoutes from './routes/apply.routes.js'
 
 const app = express()
+
+app.use(cors({
+  origin: 'http://localhost:5173'
+}))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
