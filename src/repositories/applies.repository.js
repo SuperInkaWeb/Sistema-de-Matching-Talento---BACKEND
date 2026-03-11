@@ -20,15 +20,18 @@ export const getAppliesByCandidate = async (candidateProfileId) => {
         a.applied_at,
         v.title,
         v.location,
+        v.modality,
+        v.work_schedule,
         v.salary_min,
-        v.salary_max
+        v.salary_max,
+        c.company_name
      FROM applies a
      JOIN vacancies v ON v.id = a.vacancy_id
+     LEFT JOIN companies c ON c.id = v.company_id
      WHERE a.candidate_profile_id = $1
      ORDER BY a.applied_at DESC`,
     [candidateProfileId]
   )
-
   return result.rows
 }
 
@@ -55,4 +58,12 @@ export const getApplicantsByVacancy = async (vacancyId) => {
   )
 
   return result.rows
+}
+
+export const updateApplyStatus = async (applyId, status) => {
+  const result = await pool.query(
+    'UPDATE applies SET status = $1 WHERE id = $2 RETURNING *',
+    [status, applyId]
+  )
+  return result.rows[0]
 }

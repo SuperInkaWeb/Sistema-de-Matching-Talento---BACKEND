@@ -1,12 +1,9 @@
 import { Router } from 'express'
-import {
-  register,
-  login
-} from '../controllers/user.controller.js'
+import { getProfile } from '../controllers/user.controller.js'
+import { checkJwt, syncUser } from '../middleware/auth0.middleware.js'
 
 const router = Router()
 
-router.post('/register', register)
-router.post('/login', login)
+router.get('/profile', checkJwt, syncUser, getProfile)
 
 export default router

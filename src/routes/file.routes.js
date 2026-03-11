@@ -1,7 +1,8 @@
 import express from 'express'
 import {
   uploadResumeController,
-  downloadCV
+  downloadCV,
+  getMyCVController
 } from '../controllers/file.controller.js'
 import { checkJwt, syncUser } from '../middleware/auth0.middleware.js'
 import { checkRole } from '../middleware/role.middleware.js'
@@ -26,3 +27,10 @@ router.get(
 )
 
 export default router
+
+router.get(
+  '/candidate/my-cv',
+  checkJwt,
+  syncUser,
+  getMyCVController
+)

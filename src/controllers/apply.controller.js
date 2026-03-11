@@ -1,7 +1,8 @@
 import {
   applyToVacancyService,
   getMyAppliesService,
-  getApplicantsByVacancyService
+  getApplicantsByVacancyService,
+  updateApplyStatus
 } from '../services/apply.service.js'
 
 export const applyToVacancy = async (req, res) => {
@@ -62,5 +63,19 @@ export const getApplicantsByVacancy = async (req, res) => {
     res.status(500).json({
       error: 'Error obteniendo postulantes'
     })
+  }
+}
+
+export const updateApplyStatusController = async (req, res) => {
+  try {
+    const { applyId } = req.params
+    const { status } = req.body
+    if (!['accepted', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Status inválido' })
+    }
+    const result = await updateApplyStatus(applyId, status)
+    res.json(result)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
   }
 }

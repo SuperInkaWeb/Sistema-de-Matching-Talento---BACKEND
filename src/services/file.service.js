@@ -22,30 +22,33 @@ export const uploadResumeService = async (auth0Id, file) => {
   }
 
   const profile = await findCandidateProfile(user.id)
-  const filePath = `candidates_files/resumes/${profile.id}-${Date.now()}.pdf`
-  await updateResumeUrl(user.id, filePath)
   if (!profile) {
     const error = new Error('El usuario no tiene perfil de candidato')
     error.status = 400
     throw error
   }
 
+  const filePath = `resumes/${profile.id}-${Date.now()}.pdf`
+
   await deactivatePreviousResumes(profile.id)
 
-  const { error } = await supabase.storage
+  const { error: uploadError } = await supabase.storage
     .from('candidates_files')
     .upload(filePath, file.buffer, {
-      contentType: 'application/pdf'
+      contentType: file.mimetype,
+      upsert: true
     })
 
-  if (error) {
-    const err = new Error(error.message)
+  if (uploadError) {
+    const err = new Error(uploadError.message)
     err.status = 500
     throw err
   }
 
+  await updateResumeUrl(user.id, filePath)
+
   return await createCandidateFile(profile.id, {
-    file_name: `${user.id}-${Date.now()}.pdf`,
+    file_name: `${profile.id}-${Date.now()}.pdf`,
     file_url: filePath,
     file_type: 'resume'
   })
@@ -72,4 +75,23 @@ export const downloadCVService = async (candidateProfileId) => {
     signedUrl: data.signedUrl,
     fileName: file.file_name || 'cv.pdf'
   }
+}
+
+export const getMyCVService = async (auth0Id) => {
+  const user = await findUserByAuth0Id(auth0Id)
+  if (!user) throw new Error('Usuario no encontrado')
+
+  const profile = await findCandidateProfile(user.id)
+  if (!profile) throw new Error('Perfil no encontrado')
+
+  const file = await getCandidateCV(profile.id)
+  if (!file) throw new Error('CV_NOT_FOUND')
+
+  const { data, error } = await supabase.storage
+    .from('candidates_files')
+    .createSignedUrl(file.file_url, 60)
+
+  if (error) throw new Error(error.message)
+
+  return { signedUrl: data.signedUrl, fileName: file.file_name }
 }

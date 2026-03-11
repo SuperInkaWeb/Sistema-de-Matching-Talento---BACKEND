@@ -47,3 +47,17 @@ export const getCandidateCV = async (candidateProfileId) => {
 
   return result.rows[0]
 }
+
+export const getCVByUserId = async (userId) => {
+  const result = await pool.query(
+    `SELECT f.* FROM candidate_files f
+     JOIN candidates_profile p ON p.id = f.candidate_profile_id
+     WHERE p.user_id = $1
+     AND f.file_type = 'resume'
+     AND f.is_active = true
+     ORDER BY f.created_at DESC
+     LIMIT 1`,
+    [userId]
+  )
+  return result.rows[0] || null
+}

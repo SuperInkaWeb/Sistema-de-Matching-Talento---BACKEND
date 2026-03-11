@@ -2,10 +2,13 @@ import { pool } from '../database/connectionSupabase.js'
 
 export const findUserByAuth0Id = async (auth0Id) => {
   const result = await pool.query(
-    'SELECT u.id, u.email, u.role, u.created_at, p.first_name, ' +
-    'p.last_name, p.phone, p.city, p.country,p.linkedin_url, ' +
-    'p.portfolio_url, p.resume_url, p.skills, p.experience_years ' +
-    'FROM users u LEFT JOIN candidates_profile p ON p.user_id = u.id WHERE u.auth0_id = $1',
+    `SELECT u.id, u.email, u.role, u.name, u.picture, u.created_at,
+            p.first_name, p.last_name, p.phone, p.city, p.country,
+            p.linkedin_url, p.portfolio_url, p.resume_url,
+            p.skills, p.experience_years
+     FROM users u
+     LEFT JOIN candidates_profile p ON p.user_id = u.id
+     WHERE u.auth0_id = $1`,
     [auth0Id]
   )
   return result.rows[0]

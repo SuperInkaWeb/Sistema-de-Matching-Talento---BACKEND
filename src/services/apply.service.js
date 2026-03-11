@@ -1,7 +1,8 @@
 import {
   createApply,
   getAppliesByCandidate,
-  getApplicantsByVacancy
+  getApplicantsByVacancy,
+  updateApplyStatus as updateApplyStatusRepo
 } from '../repositories/applies.repository.js'
 import { findCandidateProfile } from '../repositories/candidates.repository.js'
 
@@ -29,4 +30,8 @@ export const getApplicantsByVacancyService = async (vacancyId) => {
   const applicants = await getApplicantsByVacancy(vacancyId)
 
   return applicants
+}
+
+export const updateApplyStatus = async (applyId, status) => {
+  return await updateApplyStatusRepo(applyId, status)
 }

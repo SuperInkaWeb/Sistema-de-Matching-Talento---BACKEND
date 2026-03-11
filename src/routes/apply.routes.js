@@ -2,7 +2,8 @@ import express from 'express'
 import {
   applyToVacancy,
   getMyApplies,
-  getApplicantsByVacancy
+  getApplicantsByVacancy,
+  updateApplyStatusController
 } from '../controllers/apply.controller.js'
 import {
   checkJwt,
@@ -34,6 +35,14 @@ router.get(
   syncUser,
   checkRole(['admin', 'company']),
   getApplicantsByVacancy
+)
+
+router.put(
+  '/:applyId/status',
+  checkJwt,
+  syncUser,
+  checkRole(['company', 'admin']),
+  updateApplyStatusController
 )
 
 export default router

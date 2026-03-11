@@ -19,29 +19,22 @@ export const checkJwt = expressjwt({
 
 export const syncUser = async (req, res, next) => {
   try {
-    const authUser = req.user.sub
-    const userInfoResponse = await axios.get(
-      `https://${process.env.AUTH0_DOMAIN}/userinfo`,
-      {
-        headers: {
-          Authorization: `Bearer ${req.headers.authorization.split(' ')[1]}`
-        }
-      }
+    const token = req.headers.authorization.split(' ')[1]
+    const payload = JSON.parse(
+      Buffer.from(token.split('.')[1], 'base64').toString()
     )
 
-    const email = userInfoResponse.data.email
-
     const user = await getOrCreateUser({
-      sub: authUser,
-      email
+      sub: payload.sub,
+      email: payload.email || payload.email || null,
+      name: payload.name || null,
+      picture: payload.picture || null
     })
 
     req.dbUser = user
-
     next()
   } catch (error) {
-    res.status(500).json({
-      error: error.message || 'Error al sincronizar usuario'
-    })
+    console.error('syncUser error:', error)
+    res.status(500).json({ error: error.message || 'Error al sincronizar usuario' })
   }
 }

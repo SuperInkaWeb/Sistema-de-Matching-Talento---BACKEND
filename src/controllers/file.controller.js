@@ -1,6 +1,7 @@
 import {
   uploadResumeService,
-  downloadCVService
+  downloadCVService,
+  getMyCVService
 } from '../services/file.service.js'
 
 export const uploadResumeController = async (req, res) => {
@@ -40,5 +41,18 @@ export const downloadCV = async (req, res) => {
     res.status(500).json({
       error: 'Error al descargar CV'
     })
+  }
+}
+
+export const getMyCVController = async (req, res) => {
+  try {
+    const auth0Id = req.user.sub
+    const result = await getMyCVService(auth0Id)
+    res.json(result)
+  } catch (error) {
+    if (error.message === 'CV_NOT_FOUND') {
+      return res.status(404).json({ error: 'No tienes CV subido' })
+    }
+    res.status(500).json({ error: error.message })
   }
 }

@@ -33,10 +33,9 @@ export const createCompany = async (data) => {
 
 export const getCompanyByUserId = async (userId) => {
   const result = await pool.query(
-    'SELECT id FROM companies WHERE user_id = $1',
+    'SELECT * FROM companies WHERE user_id = $1',
     [userId]
   )
-
   return result.rows[0]
 }
 
