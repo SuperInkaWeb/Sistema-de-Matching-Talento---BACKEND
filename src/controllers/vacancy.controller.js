@@ -1,10 +1,11 @@
 import {
   createVacancyService,
-  getAllVacanciesService,
+  getAllActiveVacanciesService,
   getVacancyByIdService,
   updateVacancyService,
   deleteVacancyService,
-  getMyCompanyVacanciesService
+  getMyCompanyVacanciesService,
+  updateVacancyStatusService
 } from '../services/vacancy.service.js'
 
 export const createVacancy = async (req, res) => {
@@ -29,9 +30,9 @@ export const createVacancy = async (req, res) => {
   }
 }
 
-export const getAllVacancies = async (req, res) => {
+export const getAllActiveVacancies = async (req, res) => {
   try {
-    const vacancies = await getAllVacanciesService()
+    const vacancies = await getAllActiveVacanciesService()
     res.json(vacancies)
   } catch (error) {
     res.status(500).json({ error: 'Error obteniendo vacantes' })
@@ -111,5 +112,22 @@ export const deleteVacancy = async (req, res) => {
     res.status(500).json({
       error: 'Error eliminando vacante'
     })
+  }
+}
+
+export const updateVacancyStatus = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { status } = req.body
+    if (!['open', 'closed'].includes(status)) {
+      return res.status(400).json({ error: 'Status inválido' })
+    }
+    const result = await updateVacancyStatusService(id, status)
+    res.json(result)
+  } catch (err) {
+    if (err.message === 'VACANCY_NOT_FOUND') {
+      return res.status(404).json({ error: 'Vacante no encontrada' })
+    }
+    res.status(500).json({ error: err.message })
   }
 }

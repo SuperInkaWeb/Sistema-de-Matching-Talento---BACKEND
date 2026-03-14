@@ -7,6 +7,8 @@ import fileRoutes from './routes/file.routes.js'
 import companyRoutes from './routes/company.routes.js'
 import vacancyRoutes from './routes/vacancy.routes.js'
 import applyRoutes from './routes/apply.routes.js'
+import aiRoutes from './routes/groq.routes.js'
+import adminRoutes from './routes/admin.routes.js'
 
 const app = express()
 
@@ -22,6 +24,8 @@ app.use('/file', fileRoutes)
 app.use('/company', companyRoutes)
 app.use('/vacancy', vacancyRoutes)
 app.use('/apply', applyRoutes)
+app.use('/ai', aiRoutes)
+app.use('/admin', adminRoutes)
 
 const PORT = process.env.PORT || 4000
 

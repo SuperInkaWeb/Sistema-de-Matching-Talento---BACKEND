@@ -20,17 +20,6 @@ export const createVacancy = async (vacancy) => {
   return result.rows[0]
 }
 
-export const getAllVacancies = async () => {
-  const result = await pool.query(`
-    SELECT v.*, c.company_name
-    FROM vacancies v
-    JOIN companies c ON v.company_id = c.id
-    WHERE v.status != 'deleted'
-    ORDER BY v.created_at DESC
-  `)
-  return result.rows
-}
-
 export const getVacancyById = async (id) => {
   const result = await pool.query(
     'SELECT * FROM vacancies WHERE id = $1 AND status != \'deleted\'',
@@ -77,6 +66,25 @@ export const deleteVacancy = async (id) => {
     `UPDATE vacancies SET status='deleted', updated_at=NOW()
      WHERE id=$1 RETURNING *`,
     [id]
+  )
+  return result.rows[0]
+}
+
+export const getAllActiveVacancies = async () => {
+  const result = await pool.query(`
+    SELECT v.*, c.company_name
+    FROM vacancies v
+    LEFT JOIN companies c ON v.company_id = c.id
+    WHERE v.status = 'open'
+    ORDER BY v.created_at DESC
+  `)
+  return result.rows
+}
+
+export const updateVacancyStatus = async (id, status) => {
+  const result = await pool.query(
+    'UPDATE vacancies SET status=$1, updated_at=NOW() WHERE id=$2 RETURNING *',
+    [status, id]
   )
   return result.rows[0]
 }

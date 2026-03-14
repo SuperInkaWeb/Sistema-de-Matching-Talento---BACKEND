@@ -1,6 +1,5 @@
 import { expressjwt } from 'express-jwt'
 import jwksRsa from 'jwks-rsa'
-import axios from 'axios'
 import { getOrCreateUser } from '../services/user.service.js'
 
 export const checkJwt = expressjwt({

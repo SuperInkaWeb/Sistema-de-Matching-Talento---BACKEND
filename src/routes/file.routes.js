@@ -4,7 +4,10 @@ import {
   downloadCV,
   getMyCVController
 } from '../controllers/file.controller.js'
-import { checkJwt, syncUser } from '../middleware/auth0.middleware.js'
+import {
+  checkJwt,
+  syncUser
+} from '../middleware/auth0.middleware.js'
 import { checkRole } from '../middleware/role.middleware.js'
 import { upload } from '../middleware/upload.middleware.js'
 
@@ -19,18 +22,18 @@ router.post(
 )
 
 router.get(
-  '/download-cv/:candidateId',
-  checkJwt,
-  syncUser,
-  checkRole('company', 'admin'),
-  downloadCV
-)
-
-export default router
-
-router.get(
   '/candidate/my-cv',
   checkJwt,
   syncUser,
   getMyCVController
 )
+
+router.get(
+  '/download-cv/:candidateId',
+  checkJwt,
+  syncUser,
+  checkRole(['company', 'admin']),
+  downloadCV
+)
+
+export default router

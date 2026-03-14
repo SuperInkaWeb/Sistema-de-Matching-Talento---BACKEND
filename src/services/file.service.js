@@ -61,7 +61,10 @@ export const downloadCVService = async (candidateProfileId) => {
     throw new Error('CV_NOT_FOUND')
   }
 
-  const filePath = file.file_url.split('/candidates_files/')[1]
+  // file_url ya es el path relativo dentro del bucket
+  const filePath = file.file_url.includes('/candidates_files/')
+    ? file.file_url.split('/candidates_files/')[1]
+    : file.file_url
 
   const { data, error } = await supabase.storage
     .from('candidates_files')

@@ -1,10 +1,11 @@
 import {
   createVacancy,
-  getAllVacancies,
+  getAllActiveVacancies,
   getVacancyById,
   updateVacancy,
   deleteVacancy,
-  getVacanciesByCompanyId
+  getVacanciesByCompanyId,
+  updateVacancyStatus
 } from '../repositories/vacancies.repository.js'
 import { getCompanyByUserId } from '../repositories/companies.repository.js'
 
@@ -35,8 +36,8 @@ export const getMyCompanyVacanciesService = async (userId) => {
   return vacancies
 }
 
-export const getAllVacanciesService = async () => {
-  return await getAllVacancies()
+export const getAllActiveVacanciesService = async () => {
+  return await getAllActiveVacancies()
 }
 
 export const getVacancyByIdService = async (id) => {
@@ -66,5 +67,11 @@ export const deleteVacancyService = async (vacancyId) => {
     throw new Error('VACANCY_NOT_FOUND')
   }
 
+  return vacancy
+}
+
+export const updateVacancyStatusService = async (id, status) => {
+  const vacancy = await updateVacancyStatus(id, status)
+  if (!vacancy) throw new Error('VACANCY_NOT_FOUND')
   return vacancy
 }

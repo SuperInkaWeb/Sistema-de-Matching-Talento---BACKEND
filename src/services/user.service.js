@@ -1,6 +1,4 @@
 import {
-  findUserByAuth0Id,
-  createUser,
   upsertUser
 } from '../repositories/user.repository.js'
 

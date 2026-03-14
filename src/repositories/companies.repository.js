@@ -1,33 +1,21 @@
 import { pool } from '../database/connectionSupabase.js'
 
-export const createCompany = async (data) => {
+export const createCompany = async (userId, data) => {
   const result = await pool.query(
-    `INSERT INTO companies (
-      user_id,
-      company_name,
-      description,
-      industry,
-      website_url,
-      logo_url,
-      company_size,
-      city,
-      country
-    )
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-    RETURNING *`,
+    `INSERT INTO companies (user_id, company_name, description, industry, website_url, logo_url, company_size, city, country)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
     [
-      data.user_id,
+      userId,
       data.company_name,
-      data.description,
-      data.industry,
-      data.website_url,
-      data.logo_url,
-      data.company_size,
-      data.city,
-      data.country
+      data.description || null,
+      data.industry || null,
+      data.website_url || null,
+      data.logo_url || null,
+      data.company_size || null,
+      data.city || null,
+      data.country || null
     ]
   )
-
   return result.rows[0]
 }
 

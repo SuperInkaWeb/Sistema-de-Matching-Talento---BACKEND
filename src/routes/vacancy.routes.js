@@ -1,11 +1,12 @@
 import { Router } from 'express'
 import {
   createVacancy,
-  getAllVacancies,
+  getAllActiveVacancies,
   getVacancyById,
   updateVacancy,
   deleteVacancy,
-  getMyCompanyVacancies
+  getMyCompanyVacancies,
+  updateVacancyStatus
 } from '../controllers/vacancy.controller.js'
 import {
   checkJwt,
@@ -25,7 +26,7 @@ router.post(
 
 router.get(
   '/all',
-  getAllVacancies
+  getAllActiveVacancies
 )
 
 router.get(
@@ -55,6 +56,14 @@ router.delete(
   syncUser,
   checkRole('company', 'admin'),
   deleteVacancy
+)
+
+router.put(
+  '/status/:id',
+  checkJwt,
+  syncUser,
+  checkRole(['company', 'admin']),
+  updateVacancyStatus
 )
 
 export default router

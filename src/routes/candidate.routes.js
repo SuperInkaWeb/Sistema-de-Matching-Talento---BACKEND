@@ -1,5 +1,8 @@
 import { Router } from 'express'
-import { checkJwt, syncUser } from '../middleware/auth0.middleware.js'
+import {
+  checkJwt,
+  syncUser
+} from '../middleware/auth0.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import {
   getMe,
