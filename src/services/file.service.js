@@ -40,6 +40,7 @@ export const uploadResumeService = async (auth0Id, file) => {
     })
 
   if (uploadError) {
+    console.error('Upload error:', uploadError)
     const err = new Error(uploadError.message)
     err.status = 500
     throw err
@@ -61,7 +62,6 @@ export const downloadCVService = async (candidateProfileId) => {
     throw new Error('CV_NOT_FOUND')
   }
 
-  // file_url ya es el path relativo dentro del bucket
   const filePath = file.file_url.includes('/candidates_files/')
     ? file.file_url.split('/candidates_files/')[1]
     : file.file_url

@@ -41,11 +41,13 @@ export const getCandidateCV = async (candidateProfileId) => {
     `SELECT id, file_url, file_name
      FROM candidates_files
      WHERE candidate_profile_id = $1
+       AND file_type = 'resume'
+       AND is_active = true
+     ORDER BY created_at DESC
      LIMIT 1`,
     [candidateProfileId]
   )
-
-  return result.rows[0]
+  return result.rows[0] || null
 }
 
 export const getCVByUserId = async (userId) => {
