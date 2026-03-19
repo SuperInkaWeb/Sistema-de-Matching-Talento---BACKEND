@@ -23,11 +23,17 @@ export const findCandidateProfile = async (userId) => {
 }
 
 export const createCandidateProfile = async (userId, data) => {
+  const languagesArray = data.languages
+    ? (typeof data.languages === 'string'
+        ? data.languages.split(',').map(l => l.trim()).filter(Boolean)
+        : data.languages)
+    : []
+
   const result = await pool.query(
     `INSERT INTO candidates_profile
      (user_id, first_name, last_name, phone, city, country,
-      linkedin_url, portfolio_url, resume_url, skills, experience_years)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+      linkedin_url, portfolio_url, resume_url, skills, experience_years, languages, address)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
      RETURNING *`,
     [
       userId,
@@ -40,27 +46,27 @@ export const createCandidateProfile = async (userId, data) => {
       data.portfolio_url,
       data.resume_url,
       data.skills,
-      data.experience_years
+      data.experience_years,
+      languagesArray,
+      data.address
     ]
   )
-
   return result.rows[0]
 }
 
 export const updateCandidateProfile = async (userId, data) => {
+  const languagesArray = data.languages
+    ? (typeof data.languages === 'string'
+        ? data.languages.split(',').map(l => l.trim()).filter(Boolean)
+        : data.languages)
+    : []
+
   const result = await pool.query(
     `UPDATE candidates_profile
-     SET first_name=$1,
-         last_name=$2,
-         phone=$3,
-         city=$4,
-         country=$5,
-         linkedin_url=$6,
-         portfolio_url=$7,
-         resume_url=$8,
-         skills=$9,
-         experience_years=$10
-     WHERE user_id=$11
+     SET first_name=$1, last_name=$2, phone=$3, city=$4, country=$5,
+         linkedin_url=$6, portfolio_url=$7, resume_url=$8, skills=$9,
+         experience_years=$10, languages=$11, address=$12
+     WHERE user_id=$13
      RETURNING *`,
     [
       data.first_name,
@@ -73,10 +79,11 @@ export const updateCandidateProfile = async (userId, data) => {
       data.resume_url,
       data.skills,
       data.experience_years,
+      languagesArray,
+      data.address,
       userId
     ]
   )
-
   return result.rows[0]
 }
 

@@ -2,16 +2,21 @@ import { pool } from '../database/connectionSupabase.js'
 
 export const createRequest = async (userId, data) => {
   const result = await pool.query(
-    `INSERT INTO company_requests (user_id, company_name, description, industry, website_url, city, country)
-     VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+    `INSERT INTO company_requests
+     (user_id, owner_first_name, owner_last_name, contact_phone, ruc, razon_social, company_type, verification_code, code_expires_at, email_verified, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8, NOW() + INTERVAL '15 minutes', $9, $10)
+     RETURNING *`,
     [
       userId,
-      data.company_name,
-      data.description || null,
-      data.industry || null,
-      data.website_url || null,
-      data.city || null,
-      data.country || null
+      data.owner_first_name,
+      data.owner_last_name,
+      data.contact_phone,
+      data.ruc,
+      data.razon_social,
+      data.company_type,
+      data.verification_code,
+      data.email_verified ?? false,
+      data.status || 'pending'
     ]
   )
   return result.rows[0]
@@ -76,4 +81,15 @@ export const getAllVacanciesAdmin = async () => {
      ORDER BY v.created_at DESC`
   )
   return result.rows
+}
+
+export const verifyCode = async (userId, code) => {
+  const result = await pool.query(
+    `UPDATE company_requests
+     SET email_verified = true
+     WHERE user_id = $1 AND verification_code = $2 AND code_expires_at > NOW()
+     RETURNING *`,
+    [userId, code]
+  )
+  return result.rows[0] || null
 }

@@ -16,7 +16,6 @@ import { checkRole } from '../middleware/role.middleware.js'
 
 const router = express.Router()
 
-// Candidato solicita ser empresa
 router.post(
   '/request',
   checkJwt,
@@ -33,7 +32,6 @@ router.get(
   getMyRequestController
 )
 
-// Admin
 router.get(
   '/requests',
   checkJwt,
@@ -64,8 +62,8 @@ router.get(
   syncUser,
   checkRole(['admin']),
   getUsersController
-
 )
+
 router.get(
   '/vacancies',
   checkJwt,

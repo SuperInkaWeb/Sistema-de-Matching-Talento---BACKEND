@@ -9,6 +9,9 @@ import vacancyRoutes from './routes/vacancy.routes.js'
 import applyRoutes from './routes/apply.routes.js'
 import aiRoutes from './routes/groq.routes.js'
 import adminRoutes from './routes/admin.routes.js'
+import companyRequestRoutes from './routes/company.request.routes.js'
+import publicRequestRoutes from './routes/public.request.routes.js'
+import invitationRoutes from './routes/invitation.routes.js'
 
 const app = express()
 
@@ -26,6 +29,9 @@ app.use('/vacancy', vacancyRoutes)
 app.use('/apply', applyRoutes)
 app.use('/ai', aiRoutes)
 app.use('/admin', adminRoutes)
+app.use('/company-request', companyRequestRoutes)
+app.use('/public/company-request', publicRequestRoutes)
+app.use('/invitation', invitationRoutes)
 
 const PORT = process.env.PORT || 4000
 

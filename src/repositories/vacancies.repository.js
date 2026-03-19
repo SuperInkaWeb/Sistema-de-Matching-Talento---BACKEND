@@ -1,10 +1,15 @@
 import { pool } from '../database/connectionSupabase.js'
 
 export const createVacancy = async (vacancy) => {
+  const languagesArray = vacancy.languages
+    ? (typeof vacancy.languages === 'string'
+        ? vacancy.languages.split(',').map(l => l.trim()).filter(Boolean)
+        : vacancy.languages)
+    : []
   const result = await pool.query(
     `INSERT INTO vacancies
-     (company_id, title, description, location, salary_min, salary_max, modality, work_schedule)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+     (company_id, title, description, location, salary_min, salary_max, modality, work_schedule, languages)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
      RETURNING *`,
     [
       vacancy.company_id,
@@ -14,7 +19,8 @@ export const createVacancy = async (vacancy) => {
       vacancy.salary_min,
       vacancy.salary_max,
       vacancy.modality,
-      vacancy.work_schedule
+      vacancy.work_schedule,
+      languagesArray
     ]
   )
   return result.rows[0]
@@ -29,12 +35,16 @@ export const getVacancyById = async (id) => {
 }
 
 export const updateVacancy = async (id, vacancy) => {
+  const languagesArray = vacancy.languages
+    ? (typeof vacancy.languages === 'string'
+        ? vacancy.languages.split(',').map(l => l.trim()).filter(Boolean)
+        : vacancy.languages)
+    : []
   const result = await pool.query(
     `UPDATE vacancies
-     SET title=$1, description=$2, location=$3,
-         salary_min=$4, salary_max=$5, modality=$6,
-         work_schedule=$7, status=$8, updated_at=CURRENT_TIMESTAMP
-     WHERE id=$9 AND status != 'deleted'
+     SET title=$1, description=$2, location=$3, salary_min=$4, salary_max=$5,
+         modality=$6, work_schedule=$7, status=$8, languages=$9, updated_at=CURRENT_TIMESTAMP
+     WHERE id=$10 AND status != 'deleted'
      RETURNING *`,
     [
       vacancy.title,
@@ -45,6 +55,7 @@ export const updateVacancy = async (id, vacancy) => {
       vacancy.modality,
       vacancy.work_schedule,
       vacancy.status,
+      languagesArray,
       id
     ]
   )
@@ -72,10 +83,21 @@ export const deleteVacancy = async (id) => {
 
 export const getAllActiveVacancies = async () => {
   const result = await pool.query(`
-    SELECT v.*, c.company_name
+    SELECT v.*, c.company_name, c.city AS company_city, c.country AS company_country
     FROM vacancies v
     LEFT JOIN companies c ON v.company_id = c.id
     WHERE v.status = 'open'
+    ORDER BY v.created_at DESC
+  `)
+  return result.rows
+}
+
+export const getAllVacancies = async () => {
+  const result = await pool.query(`
+    SELECT v.*, c.company_name, c.city AS company_city, c.country AS company_country
+    FROM vacancies v
+    JOIN companies c ON v.company_id = c.id
+    WHERE v.status != 'deleted'
     ORDER BY v.created_at DESC
   `)
   return result.rows

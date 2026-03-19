@@ -47,16 +47,15 @@ export const getApplicantsByVacancy = async (vacancyId) => {
         c.city,
         c.country,
         c.skills,
+        c.languages,
         c.experience_years,
         c.resume_url
      FROM applies a
-     JOIN candidates_profile c
-       ON c.id = a.candidate_profile_id
+     JOIN candidates_profile c ON c.id = a.candidate_profile_id
      WHERE a.vacancy_id = $1
      ORDER BY a.applied_at DESC`,
     [vacancyId]
   )
-
   return result.rows
 }
 
