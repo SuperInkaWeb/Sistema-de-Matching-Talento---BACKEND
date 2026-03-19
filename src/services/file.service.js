@@ -90,11 +90,21 @@ export const getMyCVService = async (auth0Id) => {
   const file = await getCandidateCV(profile.id)
   if (!file) throw new Error('CV_NOT_FOUND')
 
+  console.log('file_url:', file.file_url) // ← agrega
+
+  const filePath = file.file_url.includes('/candidates_files/')
+    ? file.file_url.split('/candidates_files/')[1]
+    : file.file_url
+
+  console.log('filePath para Supabase:', filePath) // ← agrega
+
   const { data, error } = await supabase.storage
     .from('candidates_files')
-    .createSignedUrl(file.file_url, 60)
+    .createSignedUrl(filePath, 60)
+
+  console.log('Supabase error:', error) // ← agrega
 
   if (error) throw new Error(error.message)
 
-  return { signedUrl: data.signedUrl, fileName: file.file_name }
+  return { signedUrl: data.signedUrl, fileName: file.file_name || 'cv.pdf' }
 }

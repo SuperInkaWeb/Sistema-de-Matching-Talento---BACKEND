@@ -47,11 +47,9 @@ export const downloadCV = async (req, res) => {
 export const getMyCVController = async (req, res) => {
   try {
     const auth0Id = req.user.sub
-    console.log('getMyCVController - auth0Id:', auth0Id)
     const result = await getMyCVService(auth0Id)
     res.json(result)
   } catch (error) {
-    console.error('getMyCVController error:', error.message, error.stack)
     if (error.message === 'CV_NOT_FOUND') {
       return res.status(404).json({ error: 'No tienes CV subido' })
     }
