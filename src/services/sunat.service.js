@@ -8,7 +8,7 @@ export const getRucInfo = async (ruc) => {
     const data = await res.json()
     if (!res.ok) throw new Error('RUC no encontrado')
     return {
-      razon_social: data.razonSocial,
+      nombre: data.nombre,
       estado: data.estado,
       condicion: data.condicion,
       tipo: data.tipoContribuyente

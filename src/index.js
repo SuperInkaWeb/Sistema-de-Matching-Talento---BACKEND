@@ -12,6 +12,8 @@ import adminRoutes from './routes/admin.routes.js'
 import companyRequestRoutes from './routes/company.request.routes.js'
 import publicRequestRoutes from './routes/public.request.routes.js'
 import invitationRoutes from './routes/invitation.routes.js'
+import educationRoutes from './routes/education.routes.js'
+import contactRoutes from './routes/contact.routes.js'
 
 const app = express()
 
@@ -32,6 +34,8 @@ app.use('/admin', adminRoutes)
 app.use('/company-request', companyRequestRoutes)
 app.use('/public/company-request', publicRequestRoutes)
 app.use('/invitation', invitationRoutes)
+app.use('/education', educationRoutes)
+app.use('/contact', contactRoutes)
 
 const PORT = process.env.PORT || 4000
 

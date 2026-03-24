@@ -9,7 +9,11 @@ import {
 import { updateUserRole } from '../repositories/user.repository.js'
 import { createCompany } from '../repositories/companies.repository.js'
 import { getRucInfo } from './sunat.service.js'
-import { sendVerificationEmail, sendApprovalEmail, sendRejectionEmail } from './email.service.js'
+import {
+  sendVerificationEmail,
+  sendApprovalEmail,
+  sendRejectionEmail
+} from './email.service.js'
 
 const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString()
 

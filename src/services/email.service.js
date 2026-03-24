@@ -4,7 +4,7 @@ const defaultClient = SibApiV3Sdk.ApiClient.instance
 defaultClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY
 
 const client = new SibApiV3Sdk.TransactionalEmailsApi()
-const FROM = { email: 'victorlcf14789@gmail.com', name: 'Humantyx' }
+const FROM = { email: process.env.EMAIL, name: 'Humantyx' }
 
 export const sendVerificationEmail = async (to, code, ownerName) => {
   const email = new SibApiV3Sdk.SendSmtpEmail()
@@ -13,7 +13,9 @@ export const sendVerificationEmail = async (to, code, ownerName) => {
   email.subject = 'Código de verificación - Solicitud de cuenta empresa'
   email.htmlContent = `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #0a0a0f; margin-bottom: 8px;">Humantyx</h1>
+      <img src="${process.env.FRONTEND_URL}/logo-email.png" 
+     alt="Humantyx Jobs" 
+     style="height: 48px; width: auto; margin-bottom: 24px; display: block;" />
       <p style="color: #666; margin-bottom: 32px;">Plataforma de matching de talento</p>
       <h2 style="color: #0a0a0f;">Hola, ${ownerName} 👋</h2>
       <p style="color: #444; line-height: 1.6;">
@@ -40,7 +42,9 @@ export const sendApprovalEmail = async (to, ownerName, companyName) => {
   email.subject = '¡Tu cuenta empresa fue aprobada! - Humantyx'
   email.htmlContent = `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #0a0a0f;">Humantyx</h1>
+      <img src="${process.env.FRONTEND_URL}/logo-email.png" 
+     alt="Humantyx Jobs" 
+     style="height: 48px; width: auto; margin-bottom: 24px; display: block;" />
       <h2 style="color: #3DBFB8;">¡Felicitaciones, ${ownerName}! 🎉</h2>
       <p style="color: #444; line-height: 1.6;">
         Tu solicitud para <strong>${companyName}</strong> ha sido aprobada.
@@ -64,7 +68,9 @@ export const sendRejectionEmail = async (to, ownerName) => {
   email.subject = 'Actualización de tu solicitud - Humantyx'
   email.htmlContent = `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #0a0a0f;">Humantyx</h1>
+      <img src="${process.env.FRONTEND_URL}/logo-email.png" 
+     alt="Humantyx Jobs" 
+     style="height: 48px; width: auto; margin-bottom: 24px; display: block;" />
       <h2 style="color: #0a0a0f;">Hola, ${ownerName}</h2>
       <p style="color: #444; line-height: 1.6;">
         Lamentablemente tu solicitud de cuenta empresa no pudo ser aprobada en este momento.
@@ -84,7 +90,9 @@ export const sendInvitationEmail = async (to, token, role) => {
   email.subject = `Te invitaron a unirte a Humantyx como ${roleLabel}`
   email.htmlContent = `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #0a0a0f;">Humantyx</h1>
+      <img src="${process.env.FRONTEND_URL}/logo-email.png" 
+     alt="Humantyx Jobs" 
+     style="height: 48px; width: auto; margin-bottom: 24px; display: block;" />
       <h2 style="color: #0a0a0f;">¡Tienes una invitación! 🎉</h2>
       <p style="color: #444; line-height: 1.6;">
         Fuiste invitado a unirte a Humantyx como <strong>${roleLabel}</strong>.
@@ -102,4 +110,28 @@ export const sendInvitationEmail = async (to, token, role) => {
     </div>
   `
   return await client.sendTransacEmail(email)
+}
+
+export const sendContactEmail = async ({ name, email, subject, message }) => {
+  const mail = new SibApiV3Sdk.SendSmtpEmail()
+  mail.to = [{ email: process.env.ADMIN_EMAIL }]
+  mail.sender = FROM
+  mail.replyTo = { email, name }
+  mail.subject = `[Contacto Humantyx] ${subject}`
+  mail.htmlContent = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+      <img src="${process.env.FRONTEND_URL}/logo-email.png" alt="Humantyx Jobs"
+           style="height: 48px; width: auto; margin-bottom: 24px; display: block;" />
+      <h2 style="color: #0a0a0f;">Nuevo mensaje de contacto</h2>
+      <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+        <tr><td style="padding: 8px; font-weight:700; color:#666;">Nombre:</td><td style="padding: 8px;">${name}</td></tr>
+        <tr><td style="padding: 8px; font-weight:700; color:#666;">Email:</td><td style="padding: 8px;">${email}</td></tr>
+        <tr><td style="padding: 8px; font-weight:700; color:#666;">Asunto:</td><td style="padding: 8px;">${subject}</td></tr>
+      </table>
+      <div style="background:#f4f1eb; border-radius:12px; padding:20px;">
+        <p style="color:#444; line-height:1.7; margin:0;">${message.replace(/\n/g, '<br/>')}</p>
+      </div>
+    </div>
+  `
+  await client.sendTransacEmail(mail)
 }

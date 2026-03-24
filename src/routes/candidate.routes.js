@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import express from 'express'
 import {
   checkJwt,
   syncUser
@@ -10,7 +10,7 @@ import {
 } from '../controllers/candidate.controller.js'
 import { profileSchema } from '../validations/candidate.validator.js'
 
-const router = Router()
+const router = express.Router()
 
 router.get('/me', checkJwt, syncUser, getMe)
 

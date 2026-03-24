@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import express from 'express'
 import {
   createVacancy,
   getAllActiveVacancies,
@@ -14,7 +14,7 @@ import {
 } from '../middleware/auth0.middleware.js'
 import { checkRole } from '../middleware/role.middleware.js'
 
-const router = Router()
+const router = express.Router()
 
 router.post(
   '/create',

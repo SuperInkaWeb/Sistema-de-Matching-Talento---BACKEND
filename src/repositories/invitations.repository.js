@@ -5,7 +5,7 @@ export const createInvitation = async (data) => {
   const token = crypto.randomUUID()
   const result = await pool.query(
     `INSERT INTO invitations (token, email, role, invited_by, invited_by_role, expires_at)
-     VALUES ($1, $2, $3, $4, $5, NOW() + INTERVAL '7 days')
+     VALUES ($1, $2, $3, $4, $5, NOW() + INTERVAL '48 hours')
      RETURNING *`,
     [token, data.email, data.role, data.invited_by, data.invited_by_role]
   )

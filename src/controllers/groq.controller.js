@@ -1,4 +1,7 @@
-import { getTopVacanciesForCandidate, getTopCandidatesForVacancy } from '../services/groq.service.js'
+import {
+  getTopVacanciesForCandidate,
+  getTopCandidatesForVacancy
+} from '../services/groq.service.js'
 import { findCandidateProfile } from '../repositories/candidates.repository.js'
 import {
   getAllActiveVacancies,
