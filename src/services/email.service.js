@@ -114,7 +114,7 @@ export const sendInvitationEmail = async (to, token, role) => {
 
 export const sendContactEmail = async ({ name, email, subject, message }) => {
   const mail = new SibApiV3Sdk.SendSmtpEmail()
-  mail.to = [{ email: process.env.ADMIN_EMAIL }]
+  mail.to = [{ email: process.env.EMAIL }]
   mail.sender = FROM
   mail.replyTo = { email, name }
   mail.subject = `[Contacto Humantyx] ${subject}`
@@ -133,5 +133,5 @@ export const sendContactEmail = async ({ name, email, subject, message }) => {
       </div>
     </div>
   `
-  await client.sendTransacEmail(mail)
+  return await client.sendTransacEmail(mail)
 }
