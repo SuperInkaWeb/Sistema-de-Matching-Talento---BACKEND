@@ -7,12 +7,13 @@ import {
   getMyCompanyVacanciesService,
   updateVacancyStatusService
 } from '../services/vacancy.service.js'
+import { awardPoints } from '../services/points.service.js'
 
 export const createVacancy = async (req, res) => {
   try {
     const userId = req.dbUser.id
-
     const vacancy = await createVacancyService(userId, req.body)
+    await awardPoints(req.dbUser.id, 'CREATE_VACANCY')
 
     res.status(201).json(vacancy)
   } catch (error) {
@@ -21,9 +22,7 @@ export const createVacancy = async (req, res) => {
         error: 'Empresa no encontrada'
       })
     }
-
     console.error(error)
-
     res.status(500).json({
       error: 'Error creando vacante'
     })
@@ -47,7 +46,6 @@ export const getVacancyById = async (req, res) => {
     if (error.message === 'VACANCY_NOT_FOUND') {
       return res.status(404).json({ error: 'Vacante no encontrada' })
     }
-
     res.status(500).json({ error: 'Error obteniendo vacante' })
   }
 }
@@ -55,7 +53,6 @@ export const getVacancyById = async (req, res) => {
 export const getMyCompanyVacancies = async (req, res) => {
   try {
     const userId = req.dbUser.id
-
     const vacancies = await getMyCompanyVacanciesService(userId)
 
     res.status(200).json(vacancies)
@@ -65,9 +62,7 @@ export const getMyCompanyVacancies = async (req, res) => {
         error: 'Compañía no encontrada'
       })
     }
-
     console.error(error)
-
     res.status(500).json({
       error: 'Error al obtener vacantes de la compañía'
     })
@@ -86,7 +81,6 @@ export const updateVacancy = async (req, res) => {
     if (error.message === 'VACANCY_NOT_FOUND') {
       return res.status(404).json({ error: 'Vacante no encontrada' })
     }
-
     res.status(500).json({ error: 'Error actualizando vacante' })
   }
 }
@@ -106,9 +100,7 @@ export const deleteVacancy = async (req, res) => {
         error: 'Vacante no encontrada'
       })
     }
-
     console.error(error)
-
     res.status(500).json({
       error: 'Error eliminando vacante'
     })
@@ -119,6 +111,7 @@ export const updateVacancyStatus = async (req, res) => {
   try {
     const { id } = req.params
     const { status } = req.body
+
     if (!['open', 'closed'].includes(status)) {
       return res.status(400).json({ error: 'Status inválido' })
     }

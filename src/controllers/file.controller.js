@@ -3,16 +3,18 @@ import {
   downloadCVService,
   getMyCVService
 } from '../services/file.service.js'
+import { awardPoints } from '../services/points.service.js'
 
 export const uploadResumeController = async (req, res) => {
   try {
-    const auth0Id = req.user.sub
+    const auth0Id = req.dbUser.auth0_id
 
     if (!req.file) {
       return res.status(400).json({ message: 'Archivo requerido' })
     }
 
     const result = await uploadResumeService(auth0Id, req.file)
+    await awardPoints(req.dbUser.id, 'UPLOAD_CV')
 
     res.status(201).json(result)
   } catch (error) {

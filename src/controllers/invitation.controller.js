@@ -5,12 +5,14 @@ import {
   getMyInvitationsService,
   getAllInvitationsService
 } from '../services/invitation.service.js'
+import { awardPoints } from '../services/points.service.js'
 
 export const sendInvitation = async (req, res) => {
   try {
     const { email, role } = req.body
     const inviterRole = req.dbUser.role
     const result = await sendInvitationService(req.dbUser.id, inviterRole, email, role || 'candidate')
+    await awardPoints(req.dbUser.id, 'INVITE_USER')
     res.status(201).json(result)
   } catch (err) {
     console.error('sendInvitation error:', err.message)

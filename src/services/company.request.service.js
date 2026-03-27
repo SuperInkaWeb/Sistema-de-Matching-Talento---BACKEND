@@ -4,7 +4,13 @@ import {
   getAllRequests,
   updateRequestStatus,
   getGlobalStats,
-  verifyCode
+  verifyCode,
+  getMonthlyRegistrations,
+  getMonthlyApplications,
+  getVacancyModalityStats,
+  getApplicationStatusStats,
+  getTopVacancies,
+  getWorkScheduleStats
 } from '../repositories/companies.requests.repository.js'
 import { updateUserRole } from '../repositories/user.repository.js'
 import { createCompany } from '../repositories/companies.repository.js'
@@ -101,4 +107,29 @@ export const resolveRequestService = async (requestId, status, userEmail) => {
 
 export const getGlobalStatsService = async () => {
   return await getGlobalStats()
+}
+
+export const getAnalyticsService = async () => {
+  const [
+    stats, monthly_registrations, monthly_applications,
+    modality_stats, application_status, top_vacancies, schedule_stats
+  ] = await Promise.all([
+    getGlobalStats(),
+    getMonthlyRegistrations(),
+    getMonthlyApplications(),
+    getVacancyModalityStats(),
+    getApplicationStatusStats(),
+    getTopVacancies(),
+    getWorkScheduleStats()
+  ])
+
+  return {
+    stats,
+    monthly_registrations,
+    monthly_applications,
+    modality_stats,
+    application_status,
+    top_vacancies,
+    schedule_stats
+  }
 }

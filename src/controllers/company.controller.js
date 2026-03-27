@@ -8,7 +8,6 @@ import {
 export const createCompany = async (req, res) => {
   try {
     const userId = req.dbUser.id
-
     const company = await createCompanyService(req.body, userId)
 
     res.status(201).json(company)
@@ -27,6 +26,7 @@ export const getMyCompany = async (req, res) => {
   try {
     const userId = req.dbUser.id
     const company = await getMyCompanyService(userId)
+
     res.json(company)
   } catch (error) {
     res.status(404).json({ error: 'Compañía no encontrada' })

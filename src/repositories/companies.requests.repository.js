@@ -93,3 +93,73 @@ export const verifyCode = async (userId, code) => {
   )
   return result.rows[0] || null
 }
+
+export const getMonthlyRegistrations = async () => {
+  const result = await pool.query(`
+    SELECT 
+      TO_CHAR(created_at, 'YYYY-MM') AS month,
+      role,
+      COUNT(*) AS count
+    FROM users
+    WHERE created_at >= NOW() - INTERVAL '6 months'
+    GROUP BY month, role
+    ORDER BY month ASC
+  `)
+  return result.rows
+}
+
+export const getMonthlyApplications = async () => {
+  const result = await pool.query(`
+    SELECT 
+      TO_CHAR(applied_at, 'YYYY-MM') AS month,
+      COUNT(*) AS count
+    FROM applies
+    WHERE applied_at >= NOW() - INTERVAL '6 months'
+    GROUP BY month
+    ORDER BY month ASC
+  `)
+  return result.rows
+}
+
+export const getVacancyModalityStats = async () => {
+  const result = await pool.query(`
+    SELECT modality, COUNT(*) AS count
+    FROM vacancies
+    WHERE status != 'deleted'
+    GROUP BY modality
+  `)
+  return result.rows
+}
+
+export const getApplicationStatusStats = async () => {
+  const result = await pool.query(`
+    SELECT status, COUNT(*) AS count
+    FROM applies
+    GROUP BY status
+  `)
+  return result.rows
+}
+
+export const getTopVacancies = async () => {
+  const result = await pool.query(`
+    SELECT v.title, v.modality, c.company_name, COUNT(a.id) AS applications
+    FROM vacancies v
+    LEFT JOIN applies a ON a.vacancy_id = v.id
+    LEFT JOIN companies c ON c.id = v.company_id
+    WHERE v.status != 'deleted'
+    GROUP BY v.id, v.title, v.modality, c.company_name
+    ORDER BY applications DESC
+    LIMIT 5
+  `)
+  return result.rows
+}
+
+export const getWorkScheduleStats = async () => {
+  const result = await pool.query(`
+    SELECT work_schedule, COUNT(*) AS count
+    FROM vacancies
+    WHERE status != 'deleted'
+    GROUP BY work_schedule
+  `)
+  return result.rows
+}

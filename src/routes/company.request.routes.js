@@ -5,7 +5,8 @@ import {
   getMyRequest,
   getAllRequests,
   resolveRequest,
-  getGlobalStats
+  getGlobalStats,
+  getAnalytics
 } from '../controllers/company.request.controller.js'
 import {
   checkJwt,
@@ -70,8 +71,6 @@ router.get('/check-ruc/:ruc', checkJwt, syncUser, async (req, res) => {
   }
 })
 
-export default router
-
 router.get('/public/check-ruc/:ruc', async (req, res) => {
   try {
     const { getRucInfo } = await import('../services/sunat.service.js')
@@ -81,3 +80,13 @@ router.get('/public/check-ruc/:ruc', async (req, res) => {
     res.status(400).json({ error: err.message })
   }
 })
+
+router.get(
+  '/analytics',
+  checkJwt,
+  syncUser,
+  checkRole(['admin']),
+  getAnalytics
+)
+
+export default router

@@ -2,7 +2,13 @@ import Groq from 'groq-sdk'
 
 const getGroqClient = () => new Groq({ apiKey: process.env.GROQ_API_KEY })
 
-export const getTopVacanciesForCandidate = async (candidate, vacancies) => {
+export const getTopVacanciesForCandidate = async (candidate, vacancies, candidatePoints = 0) => {
+  const educationText = candidate.education?.length > 0
+    ? candidate.education.map(e =>
+        `${e.level} en ${e.career} — ${e.institution} (${e.status}, ${e.start_year}${e.end_year ? `—${e.end_year}` : '—Presente'})`
+    ).join('\n   ')
+    : 'No especificado'
+
   const prompt = `
 Eres un sistema experto en matching de talento humano.
 
@@ -12,12 +18,16 @@ PERFIL DEL CANDIDATO:
 - Idiomas: ${Array.isArray(candidate.languages) ? candidate.languages.join(', ') : candidate.languages || 'No especificado'}
 - Años de experiencia: ${candidate.experience_years}
 - Ciudad: ${candidate.city}, ${candidate.country}
+- Puntos este mes: ${candidatePoints}
+- Estudios académicos:
+   ${educationText}
 
 VACANTES DISPONIBLES:
 ${vacancies.map((v, i) => `
 ${i + 1}. ID: ${v.id}
    Título: ${v.title}
    Empresa: ${v.company_name || 'Sin nombre'}
+   Puntos empresa: ${v.company_points || 0}
    Ubicación: ${v.location}
    Modalidad: ${v.modality}
    Jornada: ${v.work_schedule}
@@ -25,29 +35,38 @@ ${i + 1}. ID: ${v.id}
    Descripción: ${v.description?.slice(0, 200)}
 `).join('\n')}
 
-Selecciona las 5 vacantes más compatibles con el perfil del candidato tomando en cuenta habilidades, idiomas, experiencia y ubicación.
-Responde ÚNICAMENTE con un JSON válido con esta estructura, sin texto adicional:
-{
-  "recommendations": [
-    {
-      "vacancy_id": 1,
-      "score": 95,
-      "reason": "Explicación breve de por qué es una buena coincidencia"
-    }
-  ]
-}
+Selecciona las 5 vacantes más compatibles considerando habilidades, estudios académicos, idiomas, experiencia y ubicación.
+Da prioridad a vacantes de empresas con más puntos cuando las habilidades y estudios sean similares.
+Responde ÚNICAMENTE con JSON válido sin texto adicional:
+{"recommendations":[{"vacancy_id":1,"score":95,"reason":"razón breve mencionando estudios si aplica"}]}
 `
 
   const response = await getGroqClient().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
-    messages: [{ role: 'user', content: prompt }],
+    messages: [
+      {
+        role: 'system',
+        content: 'Eres un sistema de matching de talento. Responde SIEMPRE y ÚNICAMENTE con JSON válido.'
+      },
+      { role: 'user', content: prompt }
+    ],
     temperature: 0.3,
     max_tokens: 1000
   })
 
   const text = response.choices[0]?.message?.content || ''
   const clean = text.replace(/```json|```/g, '').trim()
-  return JSON.parse(clean)
+  try {
+    return JSON.parse(clean)
+  } catch {
+    return {
+      recommendations: vacancies.slice(0, 5).map((v, i) => ({
+        vacancy_id: v.id,
+        score: Math.max(40, 80 - i * 10),
+        reason: 'Evaluado automáticamente'
+      }))
+    }
+  }
 }
 
 export const getTopCandidatesForVacancy = async (vacancy, candidates) => {

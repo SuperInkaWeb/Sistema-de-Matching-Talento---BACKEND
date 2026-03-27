@@ -4,7 +4,8 @@ import {
   getMyRequestService,
   getAllRequestsService,
   resolveRequestService,
-  getGlobalStatsService
+  getGlobalStatsService,
+  getAnalyticsService
 } from '../services/company.request.service.js'
 
 export const submitRequest = async (req, res) => {
@@ -58,6 +59,15 @@ export const resolveRequest = async (req, res) => {
 export const getGlobalStats = async (req, res) => {
   try {
     const result = await getGlobalStatsService()
+    res.json(result)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+export const getAnalytics = async (req, res) => {
+  try {
+    const result = await getAnalyticsService()
     res.json(result)
   } catch (err) {
     res.status(500).json({ error: err.message })

@@ -14,6 +14,7 @@ import publicRequestRoutes from './routes/public.request.routes.js'
 import invitationRoutes from './routes/invitation.routes.js'
 import educationRoutes from './routes/education.routes.js'
 import contactRoutes from './routes/contact.routes.js'
+import pointsRoutes from './routes/points.routes.js'
 
 const app = express()
 
@@ -36,6 +37,7 @@ app.use('/public/company-request', publicRequestRoutes)
 app.use('/invitation', invitationRoutes)
 app.use('/education', educationRoutes)
 app.use('/contact', contactRoutes)
+app.use('/points', pointsRoutes)
 
 const PORT = process.env.PORT || 4000
 
